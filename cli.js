@@ -2,53 +2,28 @@
 
 'use strict';
 
-var Lock = require('./lib/lock');
-var noble = require('noble');
-
-var argv = require('yargs')
-  .usage('Control an August Smart Lock.\nUsage: $0 [command]')
-  .example('$0 lock', 'closes the lock')
-  .example('$0 unlock', 'opens the lock')
-  .check(function(argv) {
-    if (argv._.length !== 1) {
-      return 'must specify an operation to perform';
-    }
-
-    var op = argv._[0];
-    if (typeof Lock.prototype[op] !== 'function') {
-      return 'invalid operation: ' + op;
-    }
-  })
-  .argv;
+var augustctl = require('./index');
 
 var config = require(process.env.AUGUSTCTL_CONFIG || './config.json');
 
-noble.on('stateChange', function(state) {
-  if (state === 'poweredOn') {
-    noble.startScanning([ Lock.BLE_COMMAND_SERVICE ]);
-  } else {
-    noble.stopScanning();
-  }
-});
+var op = process.argv[2];
+if (typeof augustctl.Lock.prototype[op] !== 'function') {
+  throw new Error('invalid operation: ' + op);
+}
 
-noble.on('discover', function(peripheral) {
-  if (config.uuid === undefined || peripheral.uuid === config.uuid) {
-    noble.stopScanning();
-
-    peripheral.on('disconnect', function() {
+augustctl.scan(config.lockUuid).then(function(peripheral) {
+  var lock = new augustctl.Lock(
+    peripheral,
+    config.offlineKey,
+    config.offlineKeyOffset
+  );
+  lock.connect().then(function() {
+    return lock[op]();
+  }).catch(function(e) {
+    console.error(e.toString());
+  }).finally(function() {
+    return lock.disconnect().finally(function() {
       process.exit(0);
     });
-
-    var lock = new Lock(
-      peripheral,
-      config.offlineKey,
-      config.offlineKeyOffset
-    );
-    lock.connect().then(function() {
-      var op = argv._[0];
-      return lock[op]();
-    }).finally(function() {
-      return lock.disconnect();
-    });
-  }
+  });
 });
