@@ -1,6 +1,6 @@
 {
   "name": "augustctl",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Controller for August Smart Lock",
   "author": "Dan Walters <dan@walters.io>",
   "license": "MIT",
