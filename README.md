@@ -19,11 +19,19 @@ Also tested and working on OSX Yosemite.
 
 ## Configuration
 
-It's necessary to have an `offlineKey` and corresponding `offlineKeyOffset` that are recognized by your lock.  These can be sourced from an Android phone that is already associated with the lock.
+It's necessary to have an `offlineKey` and corresponding `offlineKeyOffset` that are recognized by your lock.  
 
-On an iPhone, these items are most likely stored in the Keychain, so presumably on a jailbroken phone they can be accessed but it's not currently known how.
+### Android Phone (with Root)
 
-### All Phones
+If the phone is rooted, you can copy the `/data/data/com.august.app/shared_prefs/LockSettingsPreferences.xml` file from your phone to your computer.  Many file manager apps, or an adb shell, will let you access it, as long as your phone is rooted.
+
+Run this file through the [tools/decrypt_preferences.js](tools/decrypt_preferences.js) script to view the JSON representation of the preferences.  The script output can be used directly as your configuration file.
+
+    node tools/decrypt_preferences.js LockSettingsPreferences.xml > config.json
+
+The configuration file location can be explicitly set via the AUGUSTCTL_CONFIG environment variable.
+
+### Android Phone (without Root)
 
 It's a little more typing, but on a non-rooted phone, you can open the official app and go to the keychain view (the list of all your "houses"), click on the gear to access the settings, and long click on the application version to access the debug setttings.  As of v1.0.4.1, the password for the debug menu is `KryspyKym`.  In the debug settings display, you should see a JSON object with the offlineKey and offlineKeyOffset.
 
@@ -35,15 +43,13 @@ Be careful when transcribing the key - one small error and it will not work.
 
 Note: You can also enable Auto-Unlock for Android in the debug menu!
 
-### Rooted Phone
+### iPhone
 
-If the phone is rooted, you can copy the `/data/data/com.august.app/shared_prefs/LockSettingsPreferences.xml` file from your phone to your computer.  Many file manager apps, or an adb shell, will let you access it, as long as your phone is rooted.
+The key and offset can be found in plist located at:
 
-Run this file through the [tools/decrypt_preferences.js](tools/decrypt_preferences.js) script to view the JSON representation of the preferences.  The script output can be used directly as your configuration file.
+    User Applications/August/Library/Preferences/com.august.iossapp.plist
 
-    node tools/decrypt_preferences.js LockSettingsPreferences.xml > config.json
-
-The configuration file location can be explicitly set via the AUGUSTCTL_CONFIG environment variable.
+This can be retrieved by using a file explorer like [http://www.i-funbox.com/ifunboxmac/](iFunBox), and opening the plist in Xcode.
 
 ## Usage
 
