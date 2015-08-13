@@ -1,6 +1,6 @@
 {
   "name": "augustctl",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Controller for August Smart Lock",
   "author": "Dan Walters <dan@walters.io>",
   "license": "MIT",
@@ -15,11 +15,11 @@
     "bluetooth"
   ],
   "dependencies": {
-    "bluebird": "^2.3.10",
-    "debug": "^2.1.0",
-    "express": "^4.10.2",
-    "morgan": "^1.5.0",
-    "noble": "^0.3.6"
+    "bluebird": "^2.9.34",
+    "debug": "^2.2.0",
+    "express": "^4.13.3",
+    "morgan": "^1.6.1",
+    "noble": "^1.1.0"
   },
   "repository": {
     "type": "git",
