@@ -15,11 +15,11 @@ Also tested and working on OSX Yosemite.
 
 ## Install
 
-	npm install augustctl
+	npm install -g augustctl
 
 ## Configuration
 
-It's necessary to have an `offlineKey` and corresponding `offlineKeyOffset` that are recognized by your lock.  
+It's necessary to have an `offlineKey` and corresponding `offlineKeyOffset` that are recognized by your lock.  These should placed in a `config.json` file, which should be in your current directory when you run `augustctl`.
 
 ### Android Phone (with Root)
 
@@ -50,6 +50,10 @@ The key and offset can be found in plist located at:
     User Applications/August/Library/Preferences/com.august.iossapp.plist
 
 This can be retrieved by using a file explorer like [http://www.i-funbox.com/ifunboxmac/](iFunBox), and opening the plist in Xcode.
+
+Alternatively, you can enter the debug mode in the application by long pressing the application version number, entering the password (like in Android, it is `KryspyKym`) and e-mailing yourself the application logs.  Search those logs for "offline", and you'll find the key and slot that are used by your device.
+
+Note that the key and slot will be all that is necessary to open your lock, so it's not advisable to leave those logs laying around in your e-mail account.
 
 ## Usage
 
