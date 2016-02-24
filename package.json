@@ -19,7 +19,8 @@
     "debug": "^2.2.0",
     "express": "^4.13.3",
     "morgan": "^1.6.1",
-    "noble": "^1.1.0"
+    "noble": "^1.1.0",
+    "asyncawait": "^0.7.4"
   },
   "repository": {
     "type": "git",
