@@ -17,6 +17,7 @@ augustctl.scan(config.lockUuid).then(function(peripheral) {
     config.offlineKey,
     config.offlineKeyOffset
   );
+
   lock.connect().then(function() {
     return lock[op]();
   }).catch(function(e) {

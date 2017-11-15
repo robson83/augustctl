@@ -6,7 +6,6 @@ var morgan = require('morgan');
 var await = require('asyncawait/await');
 var async = require('asyncawait/async');
 var config = require(process.env.AUGUSTCTL_CONFIG || './config.json');
-
 var DEBUG = process.env.NODE_ENV !== 'production';
 var address = config.address || 'localhost';
 var port = config.port || 3000;
@@ -17,89 +16,93 @@ app.use(morgan(DEBUG ? 'dev' : 'combined'));
 var ret = {'status': -1, 'ret': '', 'msg': ''};
 
 app.get('/api/unlock', function(req, res) {
+
   var lock = app.get('lock');
+  
   if (!lock) {
     res.sendStatus(503);
     return;
   }
 
-
-var execStatus = async(function() {
-
-     var status = await(lock.status());
-
-     if(status == 'locked')
-     {
-
-          var cmd = await(lock.forceUnlock());
-          ret['msg'] = 'Command completed. Disconnected.';
-          ret['status'] = 0;
-          ret['ret'] = 'unlocked';
-          console.log('Released unlock request');
-
-     }
-     else
-     {   
-         ret['status'] = 1;
-         ret['msg'] = 'Lock is already unlocked';
-         res.json(ret);
-
-     }
-
-    lock.disconnect();
-    res.json(ret);
-});
-
   lock.connect().then(function(){
 
-        var exec = execStatus();
+		lock.status().then(function(data){
 
-   }).catch(function(e) {
-      console.error(e.toString());
-   });  
+			if(data == 'locked')
+			{
+
+				lock.forceUnlock().then(function(response){
+				
+					ret['msg'] = 'Command completed. Disconnected.';
+					ret['status'] = 0;
+					ret['ret'] = 'unlocked';					
+					res.json(ret);
+					
+					lock.disconnect();
+				
+				});
+
+
+			}
+			else
+			{
+				ret['status'] = 1;
+				ret['msg'] = 'Lock is already locked';
+				res.json(ret);
+				
+				lock.disconnect();
+			}
+
+
+		});
+	});
 
 });
 
 
 app.get('/api/lock', function(req, res) {
+
   var lock = app.get('lock');
+  
   if (!lock) {
     res.sendStatus(503);
     return;
   }
 
-
- var execLock = async(function() {
-     var status = await(lock.status());
-
-     if(status == 'unlocked')
-     {
-
-          var cmd = await(lock.forceLock());
-          ret['msg'] = 'Command completed. Disconnected.';
-          ret['status'] = 0;
-          ret['ret'] = 'locked';
-          console.log('Released lock request');
-
-     }
-     else
-     {   
-         ret['status'] = 1;
-         ret['msg'] = 'Lock is already locked';
-
-     }
-
-    res.json(ret);
-    lock.disconnect();
-});
-
   lock.connect().then(function(){
 
-        var status = execLock();
+		lock.status().then(function(data){
 
-   }).finally(function(){
-      console.log('Finally');
-   });  
+			if(data == 'unlocked')
+			{
+
+				lock.forceLock().then(function(response){
+				
+					ret['msg'] = 'Command completed. Disconnected.';
+					ret['status'] = 0;
+					ret['ret'] = 'locked';
+					
+					res.json(ret);
+					
+					lock.disconnect();
+				
+				});
+
+
+			}
+			else
+			{
+				ret['status'] = 1;
+				ret['msg'] = 'Lock is already locked';
+				
+				res.json(ret);
+				
+				lock.disconnect();
+			}
+
+
+		});
+	})
 
 });
 
@@ -112,27 +115,22 @@ app.get('/api/status', function(req, res){
       return;
    }
 
-   var execStatus = async(function() {
-     var status = await(lock.status());
-      ret['ret'] = status;
-      ret['status'] = 0;
-      ret['msg'] = 'Command completed.';
+   lock.connect().then(function(){
 
-     console.log('Disconnecting');
-     lock.disconnect();
+		lock.status().then(function(data){
 
-     console.log('Returning');
-     res.json(ret);
-   });
+				
+			ret['msg'] = 'Command completed. Disconnected.';
+			ret['status'] = 0;
+			ret['ret'] = data;
+		
+			res.json(ret);
+		
+			lock.disconnect();
+				
 
-
-   lock.connect().then(function() {
-      var status = execStatus();
-  
-   }).finally(function() {
-      console.log('Finally');
-   });
-
+		});
+	});
 
 });
 
